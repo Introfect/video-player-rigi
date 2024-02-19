@@ -11,9 +11,9 @@ export const removeVideo = (index) => ({
   payload: index,
 });
 
-export const reorderPlaylist = (startIndex, endIndex) => ({
+export const reorderPlaylist = (playlist) => ({
   type: REORDER_PLAYLIST,
-  payload: { startIndex, endIndex },
+  payload: { playlist },
 });
 export const changeIndex = (index) => ({
   type: CHANGE_INDEX,

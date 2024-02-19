@@ -1,10 +1,12 @@
 // components/Playlist.js
 import React from 'react';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 import { changeIndex, removeVideo, reorderPlaylist } from '../actions/playlistActions';
-
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 const Playlist = ({ playlist, removeVideo }) => {
+  const dispatch=useDispatch()
+
   const handleRemoveVideo = (index) => {
     removeVideo(index);
   };
@@ -16,34 +18,57 @@ const Playlist = ({ playlist, removeVideo }) => {
   const handleDragOver = (e) => {
     e.preventDefault();
   };
-  const handleDrop = (e, newIndex) => {
-    e.preventDefault();
-    const oldIndex = e.dataTransfer.getData('index');
-    reorderPlaylist(parseInt(oldIndex), newIndex);
+  const handleDragEnd = (result) => {
+    console.log(result,"re")
+    if (!result.destination) return;
+    const newItems = Array.from(playlist);
+    console.log(newItems,"jdnj")
+    const [reorderedItem] = newItems.splice(result.source.index, 1);
+    newItems.splice(result.destination.index, 0, reorderedItem);
+    newItems && console.log(newItems,"jjj")
+    dispatch(reorderPlaylist(newItems))
+
   };
-  const dispatch=useDispatch()
 
   return (
     <div>
       <h2>Playlist</h2>
-      <ul>
-        {playlist &&playlist[0] && playlist[0].map((video, index) => {
-          return(
-            <li 
-            className='my-4'
-            key={index} 
-            draggable onDragStart={(e) => handleDragStart(e, index)} 
-            onDragOver={handleDragOver} 
-            onDrop={(e) => handleDrop(e, index)}
+      <div>
+      <DragDropContext onDragEnd={handleDragEnd}>
+      <Droppable droppableId="droppable">
+        {(provided) => (
+          <div {...provided.droppableProps} ref={provided.innerRef}>
+      {playlist && playlist.map((video, index) => {
+         
+          return( 
+            <Draggable key={video.id} draggableId={video.id} index={index}> 
+            
+              {(provided) => (
+            <div
+            ref={provided.innerRef}
+            {...provided.draggableProps}
+            {...provided.dragHandleProps}
+            className='my-2 bg-green-500 '
+            draggable 
+            index={index}
+            id={index}
+            onDragStart={(e) => handleDragStart(e, index)} 
+            
+            // onDrop={(e) => handleDrop(e, index)}
             onClick={()=>dispatch(changeIndex(index))}>
             {video.title}
-            <button onClick={() => handleRemoveVideo(index)}>Remove</button>
-          </li>
-
-          )
-       
+            </div>
+              )}
+            
+            </Draggable>)     
 })}
-      </ul>
+{provided.placeholder}
+
+      </div>
+        )}
+        </Droppable>
+        </DragDropContext>
+    </div>
     </div>
   );
 };

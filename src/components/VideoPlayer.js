@@ -51,10 +51,9 @@ const VideoPlayer = ({ video, playlist, onNextVideo, removeVideo, reorderPlaylis
 
   return (
     <div>
-      {console.log(video,"vd")}
       <video
         ref={videoRef}
-        src={video.sources[0]}
+        src={video.sources}
         controls
         width="100%"
         height="auto"
@@ -83,4 +82,4 @@ const mapStateToProps = (state) => ({
   playlist: state.playlist.playlist,
 });
 
-export default connect(mapStateToProps, { removeVideo, reorderPlaylist })(VideoPlayer);
+export default connect(mapStateToProps, { removeVideo })(VideoPlayer);

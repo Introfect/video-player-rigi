@@ -20,11 +20,9 @@ const playlistReducer = (state = initialState, action) => {
         playlist: state.playlist.filter((_, index) => index !== action.payload),
       };
     case REORDER_PLAYLIST:
-      const { startIndex, endIndex } = action.payload;
-      console.log("reorder")
-      const reorderedPlaylist = Array.from(state.playlist);
-      const [removed] = reorderedPlaylist.splice(startIndex, 1);
-      reorderedPlaylist.splice(endIndex, 0, removed);
+      const { playlist } = action.payload;
+      const reorderedPlaylist=[...playlist]
+      console.log(state,"state")
       return {
         ...state,
         playlist: reorderedPlaylist,
@@ -34,8 +32,6 @@ const playlistReducer = (state = initialState, action) => {
         
         const currentIndex = index;
         console.log(currentIndex,"index change")
-
-        
         return {
           ...state,
           currentIndex: currentIndex,
