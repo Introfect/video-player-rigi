@@ -1,6 +1,9 @@
+// components/VideoPlayer.js
 import React, { useState, useEffect, useRef } from 'react';
+import { connect } from 'react-redux';
+import { removeVideo, reorderPlaylist } from '../actions/playlistActions';
 
-const VideoPlayer = ({ video, onNextVideo }) => {
+const VideoPlayer = ({ video, playlist, onNextVideo, removeVideo, reorderPlaylist }) => {
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(true);
   const [playedSeconds, setPlayedSeconds] = useState(0);
@@ -11,7 +14,11 @@ const VideoPlayer = ({ video, onNextVideo }) => {
       setPlayedSeconds(videoElement.currentTime);
     };
     const handleEnded = () => {
-      onNextVideo();
+      const currentIndex = playlist.findIndex(v => v === video);
+      if (currentIndex !== -1 && currentIndex < playlist.length - 1) {
+        // Play the next video in the playlist
+        onNextVideo(playlist[currentIndex + 1]);
+      }
     };
     videoElement.addEventListener('timeupdate', handleProgress);
     videoElement.addEventListener('ended', handleEnded);
@@ -19,7 +26,7 @@ const VideoPlayer = ({ video, onNextVideo }) => {
       videoElement.removeEventListener('timeupdate', handleProgress);
       videoElement.removeEventListener('ended', handleEnded);
     };
-  }, [video, onNextVideo]);
+  }, [video, playlist, onNextVideo]);
 
   useEffect(() => {
     const videoElement = videoRef.current;
@@ -44,6 +51,7 @@ const VideoPlayer = ({ video, onNextVideo }) => {
 
   return (
     <div>
+      {console.log(video,"vd")}
       <video
         ref={videoRef}
         src={video.sources[0]}
@@ -71,4 +79,8 @@ const VideoPlayer = ({ video, onNextVideo }) => {
   );
 };
 
-export default VideoPlayer;
+const mapStateToProps = (state) => ({
+  playlist: state.playlist.playlist,
+});
+
+export default connect(mapStateToProps, { removeVideo, reorderPlaylist })(VideoPlayer);
